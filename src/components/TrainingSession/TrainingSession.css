@@ -49,7 +49,7 @@
 .logo {
   font-size: 1.8rem;
   font-weight: 800;
-  color: #0088ff;
+  color: #4CAF50;
   margin-bottom: 0.5rem;
   letter-spacing: -0.03em;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
@@ -71,7 +71,7 @@
   font-size: 2.5rem;
   font-weight: 700;
   margin-top: 0.5rem;
-  color: #0088ff;
+  color: #4CAF50;
 }
 
 .stop-button {

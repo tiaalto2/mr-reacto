@@ -1,4 +1,4 @@
-import React, { useState, FormEvent } from 'react';
+import React, { useState, FormEvent, useEffect } from 'react';
 import './SessionConfig.css';
 
 export interface SessionConfigProps {
@@ -11,47 +11,90 @@ export interface SessionConfigValues {
   maxInterval: number;
 }
 
+// Storage key for localStorage
+const STORAGE_KEY = 'mr-reacto-config';
+
+// Default values
+const DEFAULT_CONFIG: SessionConfigValues = {
+  duration: 60,
+  minInterval: 2,
+  maxInterval: 5
+};
+
 const SessionConfig: React.FC<SessionConfigProps> = ({ onStartSession }) => {
-  const [duration, setDuration] = useState<number>(60);
-  const [minInterval, setMinInterval] = useState<number>(2);
-  const [maxInterval, setMaxInterval] = useState<number>(5);
+  const [duration, setDuration] = useState<number>(DEFAULT_CONFIG.duration);
+  const [minInterval, setMinInterval] = useState<number>(DEFAULT_CONFIG.minInterval);
+  const [maxInterval, setMaxInterval] = useState<number>(DEFAULT_CONFIG.maxInterval);
   
   const [durationError, setDurationError] = useState<string>('');
   const [minIntervalError, setMinIntervalError] = useState<string>('');
   const [maxIntervalError, setMaxIntervalError] = useState<string>('');
   
-  const validateDuration = (value: number): boolean => {
+  // Load saved config from localStorage on component mount
+  useEffect(() => {
+    const savedConfig = localStorage.getItem(STORAGE_KEY);
+    if (savedConfig) {
+      try {
+        const parsedConfig = JSON.parse(savedConfig) as SessionConfigValues;
+        setDuration(parsedConfig.duration);
+        setMinInterval(parsedConfig.minInterval);
+        setMaxInterval(parsedConfig.maxInterval);
+      } catch (error) {
+        console.error('Error loading saved configuration', error);
+        // If there's an error parsing, we'll use the default values
+      }
+    }
+  }, []);
+  
+  // Save config to localStorage when values change
+  useEffect(() => {
+    // Only save valid configurations
+    if (
+      validateDuration(duration, false) && 
+      validateMinInterval(minInterval, false) && 
+      validateMaxInterval(minInterval, maxInterval, false)
+    ) {
+      const configToSave: SessionConfigValues = {
+        duration,
+        minInterval,
+        maxInterval
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(configToSave));
+    }
+  }, [duration, minInterval, maxInterval]);
+  
+  const validateDuration = (value: number, updateState = true): boolean => {
     if (value < 30) {
-      setDurationError('Duration must be at least 30 seconds');
+      if (updateState) setDurationError('Duration must be at least 30 seconds');
       return false;
     }
     
     if (value > 3600) {
-      setDurationError('Duration cannot exceed 60 minutes');
+      if (updateState) setDurationError('Duration cannot exceed 60 minutes');
       return false;
     }
     
-    setDurationError('');
+    if (updateState) setDurationError('');
     return true;
   };
   
-  const validateMinInterval = (value: number): boolean => {
+  const validateMinInterval = (value: number, updateState = true): boolean => {
     if (value <= 0) {
-      setMinIntervalError('Minimum interval must be positive');
+      if (updateState) setMinIntervalError('Minimum interval must be positive');
       return false;
     }
     
-    setMinIntervalError('');
+    if (updateState) setMinIntervalError('');
     return true;
   };
   
-  const validateMaxInterval = (min: number, max: number): boolean => {
+  const validateMaxInterval = (min: number, max: number, updateState = true): boolean => {
     if (max <= min) {
-      setMaxIntervalError('Maximum interval must be greater than minimum interval');
+      if (updateState) setMaxIntervalError('Maximum interval must be greater than minimum interval');
       return false;
     }
     
-    setMaxIntervalError('');
+    if (updateState) setMaxIntervalError('');
     return true;
   };
   
@@ -63,11 +106,16 @@ const SessionConfig: React.FC<SessionConfigProps> = ({ onStartSession }) => {
     const isValidMaxInterval = validateMaxInterval(minInterval, maxInterval);
     
     if (isValidDuration && isValidMinInterval && isValidMaxInterval) {
-      onStartSession({
+      const config: SessionConfigValues = {
         duration,
         minInterval,
         maxInterval
-      });
+      };
+      
+      // Save config one last time before starting session
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(config));
+      
+      onStartSession(config);
     }
   };
   
@@ -75,6 +123,7 @@ const SessionConfig: React.FC<SessionConfigProps> = ({ onStartSession }) => {
     <div className="session-config">
       <div className="logo">Mr. Reacto</div>
       <h2>Training Configuration</h2>
+      
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="duration">

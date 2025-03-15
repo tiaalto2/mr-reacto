@@ -1,4 +1,4 @@
-export default {
+const englishTranslations = {
   appName: 'Mr. Reacto',
   appTagline: 'Athletic Reaction Training',
   
@@ -28,3 +28,5 @@ export default {
   finnish: 'Finnish',
   english: 'English'
 }; 
+
+export default englishTranslations; 

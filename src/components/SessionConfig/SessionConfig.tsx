@@ -1,4 +1,4 @@
-import React, { useState, FormEvent, useEffect } from 'react';
+import React, { useState, FormEvent, useEffect, useCallback } from 'react';
 import { useLanguage } from '../../i18n/LanguageContext';
 import LanguageSelector from '../LanguageSelector/LanguageSelector';
 import './SessionConfig.css';
@@ -33,6 +33,41 @@ const SessionConfig: React.FC<SessionConfigProps> = ({ onStartSession }) => {
   const [minIntervalError, setMinIntervalError] = useState<string>('');
   const [maxIntervalError, setMaxIntervalError] = useState<string>('');
   
+  const validateDuration = useCallback((value: number, updateState = true): boolean => {
+    if (value < 30) {
+      if (updateState) setDurationError(t.durationMin);
+      return false;
+    }
+    
+    if (value > 3600) {
+      if (updateState) setDurationError(t.durationMax);
+      return false;
+    }
+    
+    if (updateState) setDurationError('');
+    return true;
+  }, [t, setDurationError]);
+  
+  const validateMinInterval = useCallback((value: number, updateState = true): boolean => {
+    if (value <= 0) {
+      if (updateState) setMinIntervalError(t.minIntervalPositive);
+      return false;
+    }
+    
+    if (updateState) setMinIntervalError('');
+    return true;
+  }, [t, setMinIntervalError]);
+  
+  const validateMaxInterval = useCallback((min: number, max: number, updateState = true): boolean => {
+    if (max <= min) {
+      if (updateState) setMaxIntervalError(t.maxIntervalGreater);
+      return false;
+    }
+    
+    if (updateState) setMaxIntervalError('');
+    return true;
+  }, [t, setMaxIntervalError]);
+  
   // Load saved config from localStorage on component mount
   useEffect(() => {
     const savedConfig = localStorage.getItem(STORAGE_KEY);
@@ -64,42 +99,7 @@ const SessionConfig: React.FC<SessionConfigProps> = ({ onStartSession }) => {
       };
       localStorage.setItem(STORAGE_KEY, JSON.stringify(configToSave));
     }
-  }, [duration, minInterval, maxInterval]);
-  
-  const validateDuration = (value: number, updateState = true): boolean => {
-    if (value < 30) {
-      if (updateState) setDurationError(t.durationMin);
-      return false;
-    }
-    
-    if (value > 3600) {
-      if (updateState) setDurationError(t.durationMax);
-      return false;
-    }
-    
-    if (updateState) setDurationError('');
-    return true;
-  };
-  
-  const validateMinInterval = (value: number, updateState = true): boolean => {
-    if (value <= 0) {
-      if (updateState) setMinIntervalError(t.minIntervalPositive);
-      return false;
-    }
-    
-    if (updateState) setMinIntervalError('');
-    return true;
-  };
-  
-  const validateMaxInterval = (min: number, max: number, updateState = true): boolean => {
-    if (max <= min) {
-      if (updateState) setMaxIntervalError(t.maxIntervalGreater);
-      return false;
-    }
-    
-    if (updateState) setMaxIntervalError('');
-    return true;
-  };
+  }, [duration, minInterval, maxInterval, validateDuration, validateMinInterval, validateMaxInterval]);
   
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

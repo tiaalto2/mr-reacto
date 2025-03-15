@@ -116,25 +116,22 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({ config, onStopSession
   
   return (
     <div className="training-session">
-      <div className="content-area">
-        <div className={`flash-overlay ${isFlashing ? 'flashing' : ''}`} data-testid="visual-flash"></div>
-        
-        <div className="session-info">
-          <div className="logo">{t.appName}</div>
-          <h2>{t.trainingInProgress}</h2>
-          <div className="timer">
-            <span>{t.timeRemaining}</span>
-            <span className="time-display">{formatTime(timeRemaining)}</span>
-          </div>
-        </div>
-        
-        <button 
-          className="stop-button"
-          onClick={onStopSession}
-        >
-          {t.stopTraining}
-        </button>
+      <div className={`flash-overlay ${isFlashing ? 'flashing' : ''}`} data-testid="visual-flash"></div>
+      
+      <div className="logo">{t.appName}</div>
+      <h2>{t.trainingInProgress}</h2>
+      
+      <div className="timer">
+        <span>{t.timeRemaining}</span>
+        <span className="time-display">{formatTime(timeRemaining)}</span>
       </div>
+      
+      <button 
+        className="stop-button"
+        onClick={onStopSession}
+      >
+        {t.stopTraining}
+      </button>
     </div>
   );
 };

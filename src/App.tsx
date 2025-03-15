@@ -1,26 +1,39 @@
-import React from 'react';
-import logo from './logo.svg';
+import React, { useState } from 'react';
+import SessionConfig, { SessionConfigValues } from './components/SessionConfig/SessionConfig';
+import TrainingSession from './components/TrainingSession/TrainingSession';
 import './App.css';
 
-function App() {
+const App: React.FC = () => {
+  const [sessionConfig, setSessionConfig] = useState<SessionConfigValues | null>(null);
+  const [isTrainingActive, setIsTrainingActive] = useState<boolean>(false);
+  
+  const handleStartSession = (config: SessionConfigValues) => {
+    setSessionConfig(config);
+    setIsTrainingActive(true);
+  };
+  
+  const handleStopSession = () => {
+    setIsTrainingActive(false);
+  };
+  
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
+        <h1>Reaction Training</h1>
       </header>
+      
+      <main>
+        {isTrainingActive && sessionConfig ? (
+          <TrainingSession 
+            config={sessionConfig}
+            onStopSession={handleStopSession}
+          />
+        ) : (
+          <SessionConfig onStartSession={handleStartSession} />
+        )}
+      </main>
     </div>
   );
-}
+};
 
 export default App;

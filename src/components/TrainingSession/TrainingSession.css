@@ -1,0 +1,85 @@
+.training-session {
+  position: relative;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #f5f5f5;
+  padding: 2rem;
+  box-sizing: border-box;
+}
+
+.flash-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: transparent;
+  z-index: 10;
+  pointer-events: none;
+  transition: background-color 0.05s ease-out;
+}
+
+.flash-overlay.flashing {
+  background-color: rgba(255, 255, 255, 0.9);
+}
+
+.session-info {
+  text-align: center;
+  margin-bottom: 2rem;
+  z-index: 5;
+}
+
+.session-info h2 {
+  margin-bottom: 1.5rem;
+  color: #333;
+}
+
+.timer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-size: 1.2rem;
+}
+
+.time-display {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-top: 0.5rem;
+  color: #0088ff;
+}
+
+.stop-button {
+  padding: 1rem 2rem;
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  z-index: 5;
+}
+
+.stop-button:hover {
+  background-color: #c0392b;
+}
+
+@media (max-width: 600px) {
+  .timer {
+    font-size: 1rem;
+  }
+  
+  .time-display {
+    font-size: 2rem;
+  }
+  
+  .stop-button {
+    padding: 0.8rem 1.6rem;
+    font-size: 1rem;
+  }
+} 

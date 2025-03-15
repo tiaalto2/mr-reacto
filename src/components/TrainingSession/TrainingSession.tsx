@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { SessionConfigValues } from '../SessionConfig/SessionConfig';
+import { useLanguage } from '../../i18n/LanguageContext';
 import './TrainingSession.css';
 
 interface TrainingSessionProps {
@@ -24,6 +25,7 @@ const pauseAudio = (audio: HTMLAudioElement) => {
 };
 
 const TrainingSession: React.FC<TrainingSessionProps> = ({ config, onStopSession }) => {
+  const { t } = useLanguage();
   const [timeRemaining, setTimeRemaining] = useState<number>(config.duration);
   const [isFlashing, setIsFlashing] = useState<boolean>(false);
   
@@ -118,10 +120,10 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({ config, onStopSession
         <div className={`flash-overlay ${isFlashing ? 'flashing' : ''}`} data-testid="visual-flash"></div>
         
         <div className="session-info">
-          <div className="logo">Mr. Reacto</div>
-          <h2>Training in Progress</h2>
+          <div className="logo">{t.appName}</div>
+          <h2>{t.trainingInProgress}</h2>
           <div className="timer">
-            <span>Time Remaining:</span>
+            <span>{t.timeRemaining}</span>
             <span className="time-display">{formatTime(timeRemaining)}</span>
           </div>
         </div>
@@ -130,7 +132,7 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({ config, onStopSession
           className="stop-button"
           onClick={onStopSession}
         >
-          Stop Training
+          {t.stopTraining}
         </button>
       </div>
     </div>

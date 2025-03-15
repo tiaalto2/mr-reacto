@@ -1,6 +1,7 @@
-import { render, screen, act } from '@testing-library/react';
+import { render, screen, act, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import TrainingSession from '../TrainingSession/TrainingSession';
+import { LanguageProvider } from '../../i18n/LanguageContext';
 
 // Mock Audio implementation
 global.Audio = jest.fn().mockImplementation(() => ({
@@ -11,6 +12,15 @@ global.Audio = jest.fn().mockImplementation(() => ({
 
 // Mock timing functions
 jest.useFakeTimers();
+
+// Helper to wrap component with language provider
+const renderWithLanguage = (ui: React.ReactElement) => {
+  return render(
+    <LanguageProvider>
+      {ui}
+    </LanguageProvider>
+  );
+};
 
 describe('TrainingSession Component', () => {
   const mockConfig = {
@@ -25,17 +35,21 @@ describe('TrainingSession Component', () => {
     
     // Clear any Audio mocks
     (global.Audio as jest.Mock).mockClear();
+    
+    // Clear localStorage
+    localStorage.clear();
   });
 
   test('renders session timer and stop button', () => {
-    render(<TrainingSession config={mockConfig} onStopSession={jest.fn()} />);
+    renderWithLanguage(<TrainingSession config={mockConfig} onStopSession={jest.fn()} />);
     
-    expect(screen.getByText(/time remaining/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /stop training/i })).toBeInTheDocument();
+    // In both languages the remaining time is displayed
+    expect(screen.getByText(/time remaining|aikaa jäljellä/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /stop training|lopeta harjoitus/i })).toBeInTheDocument();
   });
   
   test('countdown timer decreases over time', () => {
-    render(<TrainingSession config={mockConfig} onStopSession={jest.fn()} />);
+    renderWithLanguage(<TrainingSession config={mockConfig} onStopSession={jest.fn()} />);
     
     // Initial time should be displayed (01:00 for 60 seconds)
     expect(screen.getByText(/01:00/)).toBeInTheDocument();
@@ -51,7 +65,7 @@ describe('TrainingSession Component', () => {
   
   test('session ends when timer reaches zero', () => {
     const onStopSessionMock = jest.fn();
-    render(<TrainingSession config={mockConfig} onStopSession={onStopSessionMock} />);
+    renderWithLanguage(<TrainingSession config={mockConfig} onStopSession={onStopSessionMock} />);
     
     // Advance timer to the end of the session
     act(() => {
@@ -67,14 +81,14 @@ describe('TrainingSession Component', () => {
     const mockAudio = { play: mockPlay, pause: jest.fn(), currentTime: 0 };
     (global.Audio as jest.Mock).mockImplementation(() => mockAudio);
     
-    render(<TrainingSession config={mockConfig} onStopSession={jest.fn()} />);
+    renderWithLanguage(<TrainingSession config={mockConfig} onStopSession={jest.fn()} />);
     
     // We know the first signal will be scheduled
     expect(global.Audio).toHaveBeenCalled();
   });
   
   test('flash element exists in the component', () => {
-    render(<TrainingSession config={mockConfig} onStopSession={jest.fn()} />);
+    renderWithLanguage(<TrainingSession config={mockConfig} onStopSession={jest.fn()} />);
     
     // Verify that the flash element exists
     const flashElement = screen.getByTestId('visual-flash');
@@ -84,10 +98,10 @@ describe('TrainingSession Component', () => {
   
   test('stopping session calls onStopSession', () => {
     const onStopSessionMock = jest.fn();
-    render(<TrainingSession config={mockConfig} onStopSession={onStopSessionMock} />);
+    renderWithLanguage(<TrainingSession config={mockConfig} onStopSession={onStopSessionMock} />);
     
-    // Click stop button
-    screen.getByRole('button', { name: /stop training/i }).click();
+    // Click stop button (works with either language)
+    screen.getByRole('button', { name: /stop|lopeta/i }).click();
     
     // onStopSession should be called
     expect(onStopSessionMock).toHaveBeenCalled();

@@ -18,57 +18,94 @@ describe('App Component', () => {
     jest.clearAllMocks();
     jest.clearAllTimers();
     (global.Audio as jest.Mock).mockClear();
+    
+    // Clear localStorage
+    localStorage.clear();
   });
 
   test('renders session configuration by default', () => {
     render(<App />);
     
-    // Session configuration form should be visible
-    expect(screen.getByLabelText(/session duration/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/minimum interval/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/maximum interval/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /start training/i })).toBeInTheDocument();
+    // Session configuration form should be visible (using language-independent selectors)
+    // Using test IDs or roles instead of text content which depends on language
+    expect(screen.getByLabelText(/duration/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/minimum/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/maximum/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /training/i })).toBeInTheDocument();
+    
+    // Language selector should be visible
+    expect(screen.getByLabelText(/kieli|language/i)).toBeInTheDocument();
     
     // Training session should not be visible
-    expect(screen.queryByText(/time remaining/i)).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /stop training/i })).not.toBeInTheDocument();
+    expect(screen.queryByTestId('visual-flash')).not.toBeInTheDocument();
   });
 
   test('switches to training session when configuration form is submitted', () => {
     render(<App />);
     
     // Fill out configuration form
-    fireEvent.change(screen.getByLabelText(/session duration/i), { target: { value: '60' } });
-    fireEvent.change(screen.getByLabelText(/minimum interval/i), { target: { value: '2' } });
-    fireEvent.change(screen.getByLabelText(/maximum interval/i), { target: { value: '5' } });
+    const durationInput = screen.getByLabelText(/duration/i);
+    const minIntervalInput = screen.getByLabelText(/minimum/i);
+    const maxIntervalInput = screen.getByLabelText(/maximum/i);
+    const startButton = screen.getByRole('button', { name: /training/i });
+    
+    fireEvent.change(durationInput, { target: { value: '60' } });
+    fireEvent.change(minIntervalInput, { target: { value: '2' } });
+    fireEvent.change(maxIntervalInput, { target: { value: '5' } });
     
     // Submit form
-    fireEvent.click(screen.getByRole('button', { name: /start training/i }));
+    fireEvent.click(startButton);
     
     // Training session should now be visible
-    expect(screen.getByText(/time remaining/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /stop training/i })).toBeInTheDocument();
+    expect(screen.getByTestId('visual-flash')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /stop|lopeta/i })).toBeInTheDocument();
     
     // Session configuration should not be visible
-    expect(screen.queryByLabelText(/session duration/i)).not.toBeInTheDocument();
+    expect(screen.queryByLabelText(/duration/i)).not.toBeInTheDocument();
   });
 
   test('switches back to session configuration when session is stopped', () => {
     render(<App />);
     
     // Start session
-    fireEvent.change(screen.getByLabelText(/session duration/i), { target: { value: '60' } });
-    fireEvent.change(screen.getByLabelText(/minimum interval/i), { target: { value: '2' } });
-    fireEvent.change(screen.getByLabelText(/maximum interval/i), { target: { value: '5' } });
-    fireEvent.click(screen.getByRole('button', { name: /start training/i }));
+    const durationInput = screen.getByLabelText(/duration/i);
+    const minIntervalInput = screen.getByLabelText(/minimum/i);
+    const maxIntervalInput = screen.getByLabelText(/maximum/i);
+    const startButton = screen.getByRole('button', { name: /training/i });
+    
+    fireEvent.change(durationInput, { target: { value: '60' } });
+    fireEvent.change(minIntervalInput, { target: { value: '2' } });
+    fireEvent.change(maxIntervalInput, { target: { value: '5' } });
+    fireEvent.click(startButton);
     
     // Stop session
-    fireEvent.click(screen.getByRole('button', { name: /stop training/i }));
+    const stopButton = screen.getByRole('button', { name: /stop|lopeta/i });
+    fireEvent.click(stopButton);
     
     // Session configuration should be visible again
-    expect(screen.getByLabelText(/session duration/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/minimum interval/i)).toBeInTheDocument();
-    expect(screen.getByLabelText(/maximum interval/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /start training/i })).toBeInTheDocument();
+    expect(screen.getByLabelText(/duration/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/minimum/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/maximum/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /training/i })).toBeInTheDocument();
+  });
+  
+  test('changes language when language selector is used', () => {
+    render(<App />);
+    
+    // Initial language is Finnish by default
+    expect(screen.getByText(/Harjoituksen Asetukset/i)).toBeInTheDocument();
+    
+    // Change language to English
+    const languageSelector = screen.getByLabelText(/kieli/i);
+    fireEvent.change(languageSelector, { target: { value: 'en' } });
+    
+    // UI should now be in English
+    expect(screen.getByText(/Training Configuration/i)).toBeInTheDocument();
+    
+    // Change back to Finnish
+    fireEvent.change(languageSelector, { target: { value: 'fi' } });
+    
+    // UI should be back in Finnish
+    expect(screen.getByText(/Harjoituksen Asetukset/i)).toBeInTheDocument();
   });
 });

@@ -1,10 +1,12 @@
 .session-config {
   max-width: 500px;
   margin: 0 auto;
-  padding: 2rem;
+  padding: 1.5rem;
+  padding-top: 2rem;
   border-radius: 8px;
   background-color: #f5f5f5;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
 .logo {
@@ -14,11 +16,12 @@
   margin-bottom: 0.5rem;
   letter-spacing: -0.03em;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  margin-top: 0.5rem;
 }
 
 .session-config h2 {
   text-align: center;
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
   color: #333;
   font-weight: 400;
 }
@@ -80,11 +83,13 @@
 
 @media (max-width: 600px) {
   .session-config {
-    padding: 1.5rem;
+    padding: 1rem;
+    padding-top: 1.75rem;
     margin: 0 1rem;
   }
   
   .logo {
     font-size: 1.5rem;
+    margin-top: 0.5rem;
   }
 } 

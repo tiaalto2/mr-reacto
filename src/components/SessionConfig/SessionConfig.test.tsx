@@ -1,6 +1,7 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import SessionConfig from '../SessionConfig/SessionConfig';
+import { LanguageProvider } from '../../i18n/LanguageContext';
 
 // Mock localStorage
 const localStorageMock = (() => {
@@ -23,6 +24,15 @@ Object.defineProperty(window, 'localStorage', {
   value: localStorageMock,
 });
 
+// Helper to wrap component with language provider
+const renderWithLanguage = (ui: React.ReactElement) => {
+  return render(
+    <LanguageProvider>
+      {ui}
+    </LanguageProvider>
+  );
+};
+
 describe('SessionConfig Component', () => {
   beforeEach(() => {
     jest.clearAllMocks();
@@ -30,17 +40,20 @@ describe('SessionConfig Component', () => {
   });
 
   test('renders session configuration form with default values when no saved data', () => {
-    render(<SessionConfig onStartSession={jest.fn()} />);
+    renderWithLanguage(<SessionConfig onStartSession={jest.fn()} />);
     
     // Check if all form elements are present with default values
-    const durationInput = screen.getByLabelText(/session duration/i) as HTMLInputElement;
-    const minIntervalInput = screen.getByLabelText(/minimum interval/i) as HTMLInputElement;
-    const maxIntervalInput = screen.getByLabelText(/maximum interval/i) as HTMLInputElement;
+    const durationInput = screen.getByLabelText(/duration|kesto/i) as HTMLInputElement;
+    const minIntervalInput = screen.getByLabelText(/minimi|minimum/i) as HTMLInputElement;
+    const maxIntervalInput = screen.getByLabelText(/maksimi|maximum/i) as HTMLInputElement;
     
     expect(durationInput.value).toBe('60');
     expect(minIntervalInput.value).toBe('2');
     expect(maxIntervalInput.value).toBe('5');
-    expect(screen.getByRole('button', { name: /start training/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /aloita|start/i })).toBeInTheDocument();
+    
+    // Check for language selector
+    expect(screen.getByLabelText(/kieli|language/i)).toBeInTheDocument();
   });
 
   test('loads saved configuration values from localStorage', () => {
@@ -52,12 +65,12 @@ describe('SessionConfig Component', () => {
     };
     localStorageMock.getItem.mockReturnValueOnce(JSON.stringify(savedConfig));
     
-    render(<SessionConfig onStartSession={jest.fn()} />);
+    renderWithLanguage(<SessionConfig onStartSession={jest.fn()} />);
     
     // Check if values are loaded from localStorage
-    const durationInput = screen.getByLabelText(/session duration/i) as HTMLInputElement;
-    const minIntervalInput = screen.getByLabelText(/minimum interval/i) as HTMLInputElement;
-    const maxIntervalInput = screen.getByLabelText(/maximum interval/i) as HTMLInputElement;
+    const durationInput = screen.getByLabelText(/duration|kesto/i) as HTMLInputElement;
+    const minIntervalInput = screen.getByLabelText(/minimi|minimum/i) as HTMLInputElement;
+    const maxIntervalInput = screen.getByLabelText(/maksimi|maximum/i) as HTMLInputElement;
     
     expect(durationInput.value).toBe('120');
     expect(minIntervalInput.value).toBe('3');
@@ -66,48 +79,49 @@ describe('SessionConfig Component', () => {
   });
 
   test('validates session duration between 30 seconds and 60 minutes', () => {
-    render(<SessionConfig onStartSession={jest.fn()} />);
+    renderWithLanguage(<SessionConfig onStartSession={jest.fn()} />);
     
-    const durationInput = screen.getByLabelText(/session duration/i);
+    const durationInput = screen.getByLabelText(/duration|kesto/i);
     
     // Test below minimum
     fireEvent.change(durationInput, { target: { value: '29' } });
     fireEvent.blur(durationInput);
-    expect(screen.getByText(/duration must be at least 30 seconds/i)).toBeInTheDocument();
+    // Both possible error messages (FI/EN)
+    expect(screen.getByText(/vähintään 30 sekuntia|at least 30 seconds/i)).toBeInTheDocument();
     
     // Test above maximum
     fireEvent.change(durationInput, { target: { value: '3601' } });
     fireEvent.blur(durationInput);
-    expect(screen.getByText(/duration cannot exceed 60 minutes/i)).toBeInTheDocument();
+    expect(screen.getByText(/ei voi ylittää 60 minuuttia|cannot exceed 60 minutes/i)).toBeInTheDocument();
     
     // Test valid values
     fireEvent.change(durationInput, { target: { value: '300' } });
     fireEvent.blur(durationInput);
-    expect(screen.queryByText(/duration must be at least/i)).not.toBeInTheDocument();
-    expect(screen.queryByText(/duration cannot exceed/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/vähintään 30 sekuntia|at least 30 seconds/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/ei voi ylittää 60 minuuttia|cannot exceed 60 minutes/i)).not.toBeInTheDocument();
   });
 
   test('validates minimum interval is positive', () => {
-    render(<SessionConfig onStartSession={jest.fn()} />);
+    renderWithLanguage(<SessionConfig onStartSession={jest.fn()} />);
     
-    const minIntervalInput = screen.getByLabelText(/minimum interval/i);
+    const minIntervalInput = screen.getByLabelText(/minimi|minimum/i);
     
     // Test negative value
     fireEvent.change(minIntervalInput, { target: { value: '-1' } });
     fireEvent.blur(minIntervalInput);
-    expect(screen.getByText(/minimum interval must be positive/i)).toBeInTheDocument();
+    expect(screen.getByText(/positiivinen|positive/i)).toBeInTheDocument();
     
     // Test valid value
     fireEvent.change(minIntervalInput, { target: { value: '1' } });
     fireEvent.blur(minIntervalInput);
-    expect(screen.queryByText(/minimum interval must be positive/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/positiivinen|positive/i)).not.toBeInTheDocument();
   });
 
   test('validates maximum interval is greater than minimum interval', () => {
-    render(<SessionConfig onStartSession={jest.fn()} />);
+    renderWithLanguage(<SessionConfig onStartSession={jest.fn()} />);
     
-    const minIntervalInput = screen.getByLabelText(/minimum interval/i);
-    const maxIntervalInput = screen.getByLabelText(/maximum interval/i);
+    const minIntervalInput = screen.getByLabelText(/minimi|minimum/i);
+    const maxIntervalInput = screen.getByLabelText(/maksimi|maximum/i);
     
     // Set minimum interval
     fireEvent.change(minIntervalInput, { target: { value: '5' } });
@@ -115,25 +129,25 @@ describe('SessionConfig Component', () => {
     // Test max interval less than min interval
     fireEvent.change(maxIntervalInput, { target: { value: '4' } });
     fireEvent.blur(maxIntervalInput);
-    expect(screen.getByText(/maximum interval must be greater than minimum interval/i)).toBeInTheDocument();
+    expect(screen.getByText(/suurempi kuin|greater than/i)).toBeInTheDocument();
     
     // Test valid max interval
     fireEvent.change(maxIntervalInput, { target: { value: '10' } });
     fireEvent.blur(maxIntervalInput);
-    expect(screen.queryByText(/maximum interval must be greater than minimum interval/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/suurempi kuin|greater than/i)).not.toBeInTheDocument();
   });
 
   test('calls onStartSession with correct values when form is submitted', () => {
     const onStartSessionMock = jest.fn();
-    render(<SessionConfig onStartSession={onStartSessionMock} />);
+    renderWithLanguage(<SessionConfig onStartSession={onStartSessionMock} />);
     
     // Fill out form
-    fireEvent.change(screen.getByLabelText(/session duration/i), { target: { value: '300' } });
-    fireEvent.change(screen.getByLabelText(/minimum interval/i), { target: { value: '2' } });
-    fireEvent.change(screen.getByLabelText(/maximum interval/i), { target: { value: '5' } });
+    fireEvent.change(screen.getByLabelText(/duration|kesto/i), { target: { value: '300' } });
+    fireEvent.change(screen.getByLabelText(/minimi|minimum/i), { target: { value: '2' } });
+    fireEvent.change(screen.getByLabelText(/maksimi|maximum/i), { target: { value: '5' } });
     
     // Submit form
-    fireEvent.click(screen.getByRole('button', { name: /start training/i }));
+    fireEvent.click(screen.getByRole('button', { name: /aloita|start/i }));
     
     // Check if onStartSession was called with correct values
     expect(onStartSessionMock).toHaveBeenCalledWith({
@@ -154,12 +168,12 @@ describe('SessionConfig Component', () => {
   });
 
   test('saves valid values to localStorage when values change', () => {
-    render(<SessionConfig onStartSession={jest.fn()} />);
+    renderWithLanguage(<SessionConfig onStartSession={jest.fn()} />);
     
     // Update values to valid configuration
-    fireEvent.change(screen.getByLabelText(/session duration/i), { target: { value: '180' } });
-    fireEvent.change(screen.getByLabelText(/minimum interval/i), { target: { value: '3' } });
-    fireEvent.change(screen.getByLabelText(/maximum interval/i), { target: { value: '7' } });
+    fireEvent.change(screen.getByLabelText(/duration|kesto/i), { target: { value: '180' } });
+    fireEvent.change(screen.getByLabelText(/minimi|minimum/i), { target: { value: '3' } });
+    fireEvent.change(screen.getByLabelText(/maksimi|maximum/i), { target: { value: '7' } });
     
     // Check if localStorage was updated with the new values
     expect(localStorageMock.setItem).toHaveBeenCalledWith(
@@ -173,16 +187,33 @@ describe('SessionConfig Component', () => {
   });
 
   test('does not save invalid configurations to localStorage', () => {
-    render(<SessionConfig onStartSession={jest.fn()} />);
+    renderWithLanguage(<SessionConfig onStartSession={jest.fn()} />);
     
     // Clear previous calls to setItem (from initial component render)
     jest.clearAllMocks();
     
     // Set an invalid configuration (min > max)
-    fireEvent.change(screen.getByLabelText(/minimum interval/i), { target: { value: '10' } });
-    fireEvent.change(screen.getByLabelText(/maximum interval/i), { target: { value: '5' } });
+    fireEvent.change(screen.getByLabelText(/minimi|minimum/i), { target: { value: '10' } });
+    fireEvent.change(screen.getByLabelText(/maksimi|maximum/i), { target: { value: '5' } });
     
     // localStorage.setItem should not have been called with the invalid config
     expect(localStorageMock.setItem).not.toHaveBeenCalled();
+  });
+  
+  test('language can be changed via selector', () => {
+    renderWithLanguage(<SessionConfig onStartSession={jest.fn()} />);
+    
+    // Default language is Finnish
+    expect(screen.getByText(/Harjoituksen Asetukset/i)).toBeInTheDocument();
+    
+    // Change language to English
+    const languageSelector = screen.getByLabelText(/kieli/i);
+    fireEvent.change(languageSelector, { target: { value: 'en' } });
+    
+    // Text should be in English now
+    expect(screen.getByText(/Training Configuration/i)).toBeInTheDocument();
+    
+    // Check that the change is saved to localStorage
+    expect(localStorageMock.setItem).toHaveBeenCalledWith('mr-reacto-language', 'en');
   });
 }); 

@@ -1,4 +1,6 @@
 import React, { useState, FormEvent, useEffect } from 'react';
+import { useLanguage } from '../../i18n/LanguageContext';
+import LanguageSelector from '../LanguageSelector/LanguageSelector';
 import './SessionConfig.css';
 
 export interface SessionConfigProps {
@@ -22,6 +24,7 @@ const DEFAULT_CONFIG: SessionConfigValues = {
 };
 
 const SessionConfig: React.FC<SessionConfigProps> = ({ onStartSession }) => {
+  const { t } = useLanguage();
   const [duration, setDuration] = useState<number>(DEFAULT_CONFIG.duration);
   const [minInterval, setMinInterval] = useState<number>(DEFAULT_CONFIG.minInterval);
   const [maxInterval, setMaxInterval] = useState<number>(DEFAULT_CONFIG.maxInterval);
@@ -65,12 +68,12 @@ const SessionConfig: React.FC<SessionConfigProps> = ({ onStartSession }) => {
   
   const validateDuration = (value: number, updateState = true): boolean => {
     if (value < 30) {
-      if (updateState) setDurationError('Duration must be at least 30 seconds');
+      if (updateState) setDurationError(t.durationMin);
       return false;
     }
     
     if (value > 3600) {
-      if (updateState) setDurationError('Duration cannot exceed 60 minutes');
+      if (updateState) setDurationError(t.durationMax);
       return false;
     }
     
@@ -80,7 +83,7 @@ const SessionConfig: React.FC<SessionConfigProps> = ({ onStartSession }) => {
   
   const validateMinInterval = (value: number, updateState = true): boolean => {
     if (value <= 0) {
-      if (updateState) setMinIntervalError('Minimum interval must be positive');
+      if (updateState) setMinIntervalError(t.minIntervalPositive);
       return false;
     }
     
@@ -90,7 +93,7 @@ const SessionConfig: React.FC<SessionConfigProps> = ({ onStartSession }) => {
   
   const validateMaxInterval = (min: number, max: number, updateState = true): boolean => {
     if (max <= min) {
-      if (updateState) setMaxIntervalError('Maximum interval must be greater than minimum interval');
+      if (updateState) setMaxIntervalError(t.maxIntervalGreater);
       return false;
     }
     
@@ -121,13 +124,14 @@ const SessionConfig: React.FC<SessionConfigProps> = ({ onStartSession }) => {
   
   return (
     <div className="session-config">
-      <div className="logo">Mr. Reacto</div>
-      <h2>Training Configuration</h2>
+      <LanguageSelector />
+      <div className="logo">{t.appName}</div>
+      <h2>{t.trainingConfiguration}</h2>
       
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="duration">
-            Session Duration (seconds):
+            {t.sessionDuration}
             <input
               id="duration"
               type="number"
@@ -139,12 +143,12 @@ const SessionConfig: React.FC<SessionConfigProps> = ({ onStartSession }) => {
             />
           </label>
           {durationError && <div className="error">{durationError}</div>}
-          <div className="help-text">From 30 seconds to 60 minutes (3600 seconds)</div>
+          <div className="help-text">{t.durationHelp}</div>
         </div>
         
         <div className="form-group">
           <label htmlFor="minInterval">
-            Minimum Interval (seconds):
+            {t.minimumInterval}
             <input
               id="minInterval"
               type="number"
@@ -159,7 +163,7 @@ const SessionConfig: React.FC<SessionConfigProps> = ({ onStartSession }) => {
         
         <div className="form-group">
           <label htmlFor="maxInterval">
-            Maximum Interval (seconds):
+            {t.maximumInterval}
             <input
               id="maxInterval"
               type="number"
@@ -172,7 +176,7 @@ const SessionConfig: React.FC<SessionConfigProps> = ({ onStartSession }) => {
           {maxIntervalError && <div className="error">{maxIntervalError}</div>}
         </div>
         
-        <button type="submit" className="start-button">Start Training</button>
+        <button type="submit" className="start-button">{t.startTraining}</button>
       </form>
     </div>
   );

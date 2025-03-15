@@ -27,11 +27,11 @@ describe('App Component', () => {
     expect(screen.getByLabelText(/session duration/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/minimum interval/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/maximum interval/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /start session/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /start training/i })).toBeInTheDocument();
     
     // Training session should not be visible
     expect(screen.queryByText(/time remaining/i)).not.toBeInTheDocument();
-    expect(screen.queryByRole('button', { name: /stop session/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /stop training/i })).not.toBeInTheDocument();
   });
 
   test('switches to training session when configuration form is submitted', () => {
@@ -43,11 +43,11 @@ describe('App Component', () => {
     fireEvent.change(screen.getByLabelText(/maximum interval/i), { target: { value: '5' } });
     
     // Submit form
-    fireEvent.click(screen.getByRole('button', { name: /start session/i }));
+    fireEvent.click(screen.getByRole('button', { name: /start training/i }));
     
     // Training session should now be visible
     expect(screen.getByText(/time remaining/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /stop session/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /stop training/i })).toBeInTheDocument();
     
     // Session configuration should not be visible
     expect(screen.queryByLabelText(/session duration/i)).not.toBeInTheDocument();
@@ -60,15 +60,15 @@ describe('App Component', () => {
     fireEvent.change(screen.getByLabelText(/session duration/i), { target: { value: '60' } });
     fireEvent.change(screen.getByLabelText(/minimum interval/i), { target: { value: '2' } });
     fireEvent.change(screen.getByLabelText(/maximum interval/i), { target: { value: '5' } });
-    fireEvent.click(screen.getByRole('button', { name: /start session/i }));
+    fireEvent.click(screen.getByRole('button', { name: /start training/i }));
     
     // Stop session
-    fireEvent.click(screen.getByRole('button', { name: /stop session/i }));
+    fireEvent.click(screen.getByRole('button', { name: /stop training/i }));
     
     // Session configuration should be visible again
     expect(screen.getByLabelText(/session duration/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/minimum interval/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/maximum interval/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /start session/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /start training/i })).toBeInTheDocument();
   });
 });

@@ -1,6 +1,6 @@
 import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
-import SessionConfig from './SessionConfig';
+import SessionConfig from '../SessionConfig/SessionConfig';
 
 describe('SessionConfig Component', () => {
   test('renders session configuration form', () => {
@@ -10,7 +10,7 @@ describe('SessionConfig Component', () => {
     expect(screen.getByLabelText(/session duration/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/minimum interval/i)).toBeInTheDocument();
     expect(screen.getByLabelText(/maximum interval/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /start session/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /start training/i })).toBeInTheDocument();
   });
 
   test('validates session duration between 30 seconds and 60 minutes', () => {
@@ -81,7 +81,7 @@ describe('SessionConfig Component', () => {
     fireEvent.change(screen.getByLabelText(/maximum interval/i), { target: { value: '5' } });
     
     // Submit form
-    fireEvent.click(screen.getByRole('button', { name: /start session/i }));
+    fireEvent.click(screen.getByRole('button', { name: /start training/i }));
     
     // Check if onStartSession was called with correct values
     expect(onStartSessionMock).toHaveBeenCalledWith({

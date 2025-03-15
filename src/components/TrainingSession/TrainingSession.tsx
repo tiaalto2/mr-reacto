@@ -35,6 +35,9 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({ config, onStopSession
   // Audio instance
   const audioRef = useRef<HTMLAudioElement | null>(null);
   
+  // Flash duration in milliseconds
+  const FLASH_DURATION = 250; // Reduced from 500ms to 250ms
+  
   // Format time as MM:SS
   const formatTime = (seconds: number): string => {
     const minutes = Math.floor(seconds / 60);
@@ -69,15 +72,15 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({ config, onStopSession
       window.clearTimeout(flashTimerRef.current);
     }
     
-    // Hide flash after 500ms
+    // Hide flash after the specified duration
     flashTimerRef.current = window.setTimeout(() => {
       setIsFlashing(false);
-    }, 500);
+    }, FLASH_DURATION);
     
     // Schedule next signal with a random interval
     const nextInterval = getRandomInterval();
     signalTimerRef.current = window.setTimeout(() => triggerSignal(), nextInterval);
-  }, [getRandomInterval]);
+  }, [getRandomInterval, FLASH_DURATION]);
   
   // Initialize session when component mounts
   useEffect(() => {
@@ -111,23 +114,25 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({ config, onStopSession
   
   return (
     <div className="training-session">
-      <div className={`flash-overlay ${isFlashing ? 'flashing' : ''}`} data-testid="visual-flash"></div>
-      
-      <div className="session-info">
-        <div className="logo">Mr. Reacto</div>
-        <h2>Training in Progress</h2>
-        <div className="timer">
-          <span>Time Remaining:</span>
-          <span className="time-display">{formatTime(timeRemaining)}</span>
+      <div className="content-area">
+        <div className={`flash-overlay ${isFlashing ? 'flashing' : ''}`} data-testid="visual-flash"></div>
+        
+        <div className="session-info">
+          <div className="logo">Mr. Reacto</div>
+          <h2>Training in Progress</h2>
+          <div className="timer">
+            <span>Time Remaining:</span>
+            <span className="time-display">{formatTime(timeRemaining)}</span>
+          </div>
         </div>
+        
+        <button 
+          className="stop-button"
+          onClick={onStopSession}
+        >
+          Stop Training
+        </button>
       </div>
-      
-      <button 
-        className="stop-button"
-        onClick={onStopSession}
-      >
-        Stop Training
-      </button>
     </div>
   );
 };

@@ -31,7 +31,7 @@ describe('TrainingSession Component', () => {
     render(<TrainingSession config={mockConfig} onStopSession={jest.fn()} />);
     
     expect(screen.getByText(/time remaining/i)).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: /stop session/i })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /stop training/i })).toBeInTheDocument();
   });
   
   test('countdown timer decreases over time', () => {
@@ -124,9 +124,9 @@ describe('TrainingSession Component', () => {
     // Now the flash element should have the flashing class
     expect(flashElement).toHaveClass('flashing');
     
-    // After 500ms, the flash should disappear
+    // After 250ms, the flash should disappear
     act(() => {
-      jest.advanceTimersByTime(500);
+      jest.advanceTimersByTime(250);
     });
     
     // Flash element should no longer have the flashing class
@@ -141,7 +141,7 @@ describe('TrainingSession Component', () => {
     render(<TrainingSession config={mockConfig} onStopSession={onStopSessionMock} />);
     
     // Click stop button
-    screen.getByRole('button', { name: /stop session/i }).click();
+    screen.getByRole('button', { name: /stop training/i }).click();
     
     // onStopSession should be called
     expect(onStopSessionMock).toHaveBeenCalled();

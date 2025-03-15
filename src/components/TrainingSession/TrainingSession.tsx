@@ -114,6 +114,7 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({ config, onStopSession
       <div className={`flash-overlay ${isFlashing ? 'flashing' : ''}`} data-testid="visual-flash"></div>
       
       <div className="session-info">
+        <div className="logo">Mr. Reacto</div>
         <h2>Training in Progress</h2>
         <div className="timer">
           <span>Time Remaining:</span>
@@ -125,7 +126,7 @@ const TrainingSession: React.FC<TrainingSessionProps> = ({ config, onStopSession
         className="stop-button"
         onClick={onStopSession}
       >
-        Stop Session
+        Stop Training
       </button>
     </div>
   );

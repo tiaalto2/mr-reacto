@@ -19,7 +19,8 @@ const App: React.FC = () => {
   return (
     <div className="App">
       <header className="App-header">
-        <h1>Reaction Training</h1>
+        <h1>Mr. Reacto</h1>
+        <p className="tagline">Athletic Reaction Training</p>
       </header>
       
       <main>

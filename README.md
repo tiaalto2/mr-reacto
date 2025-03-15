@@ -1,6 +1,6 @@
-# Reaction Training App
+# Mr. Reacto
 
-A React application designed for athletes to improve their reaction time through randomly timed visual and audio cues.
+An athletic reaction training app designed to improve athletes' response time through randomly timed visual and audio cues.
 
 ## Features
 
@@ -48,12 +48,12 @@ npm run build
 1. **Configure Training Session**:
    - Set the session duration (30 seconds to 60 minutes)
    - Set minimum and maximum intervals between signals
-   - Click "Start Session" to begin
+   - Click "Start Training" to begin
 
 2. **During Training**:
    - The screen will flash and a gunshot sound will play at random intervals
    - A timer displays the remaining session time
-   - Click "Stop Session" to end training early
+   - Click "Stop Training" to end training early
 
 ## Development
 

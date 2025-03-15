@@ -25,11 +25,24 @@
   color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   margin-bottom: 2rem;
+  position: relative;
 }
 
 .App-header h1 {
   margin: 0;
-  font-size: 2rem;
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.App-header .tagline {
+  margin: 0.3rem 0 0;
+  font-size: 1rem;
+  font-weight: 300;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.9;
 }
 
 main {
@@ -58,6 +71,10 @@ main {
   }
   
   .App-header h1 {
-    font-size: 1.6rem;
+    font-size: 2rem;
+  }
+  
+  .App-header .tagline {
+    font-size: 0.8rem;
   }
 }

@@ -73,7 +73,8 @@ const SessionConfig: React.FC<SessionConfigProps> = ({ onStartSession }) => {
   
   return (
     <div className="session-config">
-      <h2>Reaction Training Configuration</h2>
+      <div className="logo">Mr. Reacto</div>
+      <h2>Training Configuration</h2>
       <form onSubmit={handleSubmit}>
         <div className="form-group">
           <label htmlFor="duration">
@@ -122,7 +123,7 @@ const SessionConfig: React.FC<SessionConfigProps> = ({ onStartSession }) => {
           {maxIntervalError && <div className="error">{maxIntervalError}</div>}
         </div>
         
-        <button type="submit" className="start-button">Start Session</button>
+        <button type="submit" className="start-button">Start Training</button>
       </form>
     </div>
   );
